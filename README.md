@@ -1,4 +1,4 @@
-**Projektbeschreibung: Security Quest**
+**Projektname: Security Quest**
 
 **Überblick:**
 Eine Android-App, die spielerisch die Passwortsicherheit verbessert. Sie bewertet Passwörter und startet basierend darauf interaktive Spiele.
