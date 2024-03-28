@@ -3,7 +3,6 @@ package com.example.securityquest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Build
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Settings
@@ -53,7 +51,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineBreak
@@ -116,16 +113,15 @@ fun generatePassword(
 @Composable
 fun StartingPage(modifier: Modifier = Modifier) {
     Box(modifier) {
-        var isDialogOpen by rememberSaveable {
+        var isPasswordDialogOpen by rememberSaveable {
             mutableStateOf(false)
         }
         var passwordFromUser by rememberSaveable {
             mutableStateOf("")
         }
-        val clipboardManager: ClipboardManager = LocalClipboardManager.current
         Row(horizontalArrangement = Arrangement.End) {
             FilledIconButton(
-                onClick = { isDialogOpen = true },
+                onClick = { isPasswordDialogOpen = true },
                 modifier = Modifier.padding(start = 10.dp, top = 10.dp)
             ) {
                 Icon(imageVector = Icons.Rounded.Star, contentDescription = "Create Password")
@@ -157,7 +153,7 @@ fun StartingPage(modifier: Modifier = Modifier) {
                 },
             )
 
-            var isExpanded by rememberSaveable {
+            var isGameSelectionExpanded by rememberSaveable {
                 mutableStateOf(false)
             }
 
@@ -172,8 +168,8 @@ fun StartingPage(modifier: Modifier = Modifier) {
             )
             Row(modifier = Modifier.padding(15.dp)) {
                 ExposedDropdownMenuBox(
-                    expanded = isExpanded,
-                    onExpandedChange = { isExpanded = it }) {
+                    expanded = isGameSelectionExpanded,
+                    onExpandedChange = { isGameSelectionExpanded = it }) {
                     InputChip(
                         selected = false,
                         onClick = { },
@@ -183,23 +179,23 @@ fun StartingPage(modifier: Modifier = Modifier) {
                             .padding(end = 15.dp),
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(
-                                expanded = isExpanded
+                                expanded = isGameSelectionExpanded
                             )
                         })
                     ExposedDropdownMenu(
-                        expanded = isExpanded,
-                        onDismissRequest = { isExpanded = false }) {
+                        expanded = isGameSelectionExpanded,
+                        onDismissRequest = { isGameSelectionExpanded = false }) {
                         DropdownMenuItem(text = { Text(text = "Tic Tac Toe") }, onClick = {
                             game = "Tic Tac Toe "
-                            isExpanded = false
+                            isGameSelectionExpanded = false
                         })
                         DropdownMenuItem(text = { Text(text = "Vier Gewinnt") }, onClick = {
                             game = "Vier Gewinnt"
-                            isExpanded = false
+                            isGameSelectionExpanded = false
                         })
                         DropdownMenuItem(text = { Text(text = "Brick") }, onClick = {
                             game = "    Brick   "
-                            isExpanded = false
+                            isGameSelectionExpanded = false
                         })
                     }
                 }
@@ -209,8 +205,8 @@ fun StartingPage(modifier: Modifier = Modifier) {
                 }
             }
         }
-        if (isDialogOpen) {
-            Dialog(onDismissRequest = { isDialogOpen = false }) {
+        if (isPasswordDialogOpen) {
+            Dialog(onDismissRequest = { isPasswordDialogOpen = false }) {
                 var lengthSlider by remember { mutableIntStateOf(8) }
                 var useCapitalCharacters by remember { mutableStateOf(false) }
                 var useLowercaseCharacters by remember { mutableStateOf(false) }
@@ -339,11 +335,11 @@ fun StartingPage(modifier: Modifier = Modifier) {
                                     lengthSlider
                                 )
                             },
-                            modifier = Modifier.padding(start = 13.dp),
+                            modifier = Modifier.padding(start = 5.dp),
                             enabled = useCapitalCharacters || useLowercaseCharacters || useNumbers || useSpecialCharacters
                         ) {
                             Icon(
-                                imageVector = Icons.Rounded.Build,
+                                imageVector = Icons.Rounded.PlayArrow,
                                 contentDescription = "Erstellen"
                             )
                         }
@@ -360,14 +356,14 @@ fun StartingPage(modifier: Modifier = Modifier) {
                     )
                     Row {
                         Spacer(Modifier.weight(1f))
-                        TextButton(onClick = { isDialogOpen = false }) {
+                        TextButton(onClick = { isPasswordDialogOpen = false }) {
                             Text(text = "Abbrechen")
                         }
                         TextButton(enabled = generatedPassword.isNotEmpty(), onClick = {
-                            isDialogOpen = false
+                            isPasswordDialogOpen = false
                             passwordFromUser = generatedPassword
                         }) {
-                            Text(text = "Testen")
+                            Text(text = "Einsetzen")
                         }
                     }
                 }
