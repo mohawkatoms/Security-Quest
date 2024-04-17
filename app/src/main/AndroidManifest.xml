@@ -11,11 +11,11 @@
         android:roundIcon="@mipmap/security_quest_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SecurityQuest"
-        tools:targetApi="31" >
+         >
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.SecurityQuest"
+            android:theme="@style/Theme.App.Starting"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
