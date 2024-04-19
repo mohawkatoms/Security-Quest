@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.securityquest.ui.theme.SecurityQuestTheme
+import com.example.securityquest.util.generatePassword
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,37 +79,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
-
-fun generatePassword(
-    useCapitalCharacters: Boolean,
-    useLowercaseCharacters: Boolean,
-    useNumbers: Boolean,
-    useSpecialCharacters: Boolean,
-    lengthSlider: Int
-): String {
-    val capitalChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    val lowercaseChars = "abcdefghijklmnopqrstuvwxyz"
-    val numbers = "0123456789"
-    val specialChars = "!@#$%^&*()_+{}[]|\\:;<>,.?/~"
-
-    val allowedChars = StringBuilder()
-    if (useCapitalCharacters) allowedChars.append(capitalChars)
-    if (useLowercaseCharacters) allowedChars.append(lowercaseChars)
-    if (useNumbers) allowedChars.append(numbers)
-    if (useSpecialCharacters) allowedChars.append(specialChars)
-
-    // Ensure minimum length is 8
-    val passwordLength = if (lengthSlider < 8) 8 else lengthSlider
-    val password = StringBuilder()
-    val random = java.util.Random()
-
-    repeat(passwordLength) {
-        val randomIndex = random.nextInt(allowedChars.length)
-        password.append(allowedChars[randomIndex])
-    }
-
-    return password.toString()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
