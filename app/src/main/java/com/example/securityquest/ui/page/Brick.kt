@@ -1,5 +1,8 @@
 package com.example.securityquest.ui.page
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,17 +25,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
+import com.example.securityquest.ui.components.AnimatedLinearProgressIndicator
 
 @Composable
 fun BrickPage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int) {
@@ -61,13 +71,10 @@ fun BrickPage(modifier: Modifier = Modifier, navController: NavController, passw
             }
         }
         Column (
-            modifier = Modifier.fillMaxSize().padding(top = 55.dp)) {
-            LinearProgressIndicator(
-                progress = passwordStrength/100.toFloat(),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp)
-            )
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 55.dp)) {
+            AnimatedLinearProgressIndicator(indicatorProgress = passwordStrength/100.toFloat())
             Row {
                 Text(
                     text = "Brick",

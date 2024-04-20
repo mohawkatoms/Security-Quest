@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.example.securityquest.ui.components.AnimatedLinearProgressIndicator
 
 @Composable
 fun TicTacToePage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int) {
@@ -64,12 +65,7 @@ fun TicTacToePage(modifier: Modifier = Modifier, navController: NavController, p
         }
         Column (
             modifier = Modifier.fillMaxSize().padding(top = 55.dp)) {
-            LinearProgressIndicator(
-                progress = passwordStrength/100.toFloat(),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp)
-            )
+            AnimatedLinearProgressIndicator(indicatorProgress = passwordStrength/100.toFloat())
             Row {
                 Text(
                     text = "Tic Tac Toe",
