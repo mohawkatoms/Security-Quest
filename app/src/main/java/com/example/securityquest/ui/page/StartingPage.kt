@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.List
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -47,15 +48,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.securityquest.R
 import com.example.securityquest.model.Game
+import com.example.securityquest.ui.components.FilteredOutlinedTextField
 import com.example.securityquest.util.calculatePasswordStrength
 import com.example.securityquest.util.generatePassword
+
+//Font von Uberschrift
+val provider = GoogleFont.Provider(
+    providerAuthority = "com.google.android.gms.fonts",
+    providerPackage = "com.google.android.gms",
+    certificates = R.array.com_google_android_gms_fonts_certs
+)
+
+val fontName = GoogleFont("Rubik Glitch")
+
+val fontFamily = FontFamily(
+    Font(
+        googleFont = fontName,
+        fontProvider = provider,
+        weight = FontWeight.Bold,
+        style = FontStyle.Italic
+    )
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +101,7 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
                 onCheckedChange = { isPasswordDialogOpen = true },
                 modifier = Modifier.padding(start = 10.dp, top = 10.dp)
             ) {
-                Icon(imageVector = Icons.Rounded.Star, contentDescription = "Create Password")
+                Icon(imageVector = Icons.Outlined.AddCircle, contentDescription = "Create Password")
             }
             Spacer(Modifier.weight(1f))
             FilledIconToggleButton(
@@ -93,6 +118,7 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
         ) {
             val context = LocalContext.current
             Text(
+                fontFamily = fontFamily,
                 text = "Security Quest",
                 fontWeight = FontWeight.Bold,
                 fontSize = 80.sp,
@@ -113,11 +139,10 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
             var game by rememberSaveable {
                 mutableStateOf(Game.TIC_TAC_TOE.nameToString)
             }
-            OutlinedTextField(
-                value = passwordFromUser,
-                onValueChange = { passwordFromUser = it },
-                label = { Text("Passwort") },
-                modifier = Modifier.padding(top = 80.dp)
+            FilteredOutlinedTextField(
+                text = passwordFromUser,
+                onChanged = { passwordFromUser = it},
+                ignoredRegex = Regex("[\\s-]"),
             )
             Row(modifier = Modifier.padding(15.dp)) {
                 ExposedDropdownMenuBox(

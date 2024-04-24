@@ -3,7 +3,9 @@ package com.example.securityquest.ui.components
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
@@ -31,14 +33,16 @@ fun AnimatedLinearProgressIndicator(
         animationSpec = tween(durationMillis = progressAnimDuration, easing = FastOutSlowInEasing),
         label = "",
     )
-    LinearProgressIndicator(
-        progress = progressAnimation,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .padding(top = 10.dp)
-    )
-    LaunchedEffect(lifecycleOwner) {
-        progress = indicatorProgress
+    Box(modifier = Modifier.padding(top = 10.dp, start = 4.dp, end = 4.dp)) {
+        LinearProgressIndicator(
+            progress = progressAnimation,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .height(5.dp)
+        )
+        LaunchedEffect(lifecycleOwner) {
+            progress = indicatorProgress
+        }
     }
 }
