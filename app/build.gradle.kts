@@ -74,6 +74,9 @@ dependencies {
     //SplashScreen
     implementation("androidx.core:core-splashscreen:1.0.1")
 
+    //Google Fonts
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.1")
+
     //Default
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
