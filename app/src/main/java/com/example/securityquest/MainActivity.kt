@@ -17,6 +17,7 @@ import com.example.securityquest.ui.page.BrickPage
 import com.example.securityquest.ui.page.StartingPage
 import com.example.securityquest.ui.page.TicTacToePage
 import com.example.securityquest.ui.page.VierGewinntPage
+import com.example.securityquest.ui.page.tictactoeresult.TicTacToeResultPage
 import com.example.securityquest.ui.theme.SecurityQuestTheme
 
 class MainActivity : ComponentActivity() {
@@ -40,7 +41,16 @@ class MainActivity : ComponentActivity() {
                         composable("ticTacToePage/{passwordStrength}", arguments = listOf(
                             navArgument("passwordStrength") {type = NavType.IntType}
                         )) { val passwordStrength = it.arguments?.getInt("passwordStrength") ?: 1
-                            TicTacToePage(navController = navController, passwordStrength = passwordStrength)}
+                            TicTacToePage(navController = navController, passwordStrength = passwordStrength, onNavigateToTicTacToeResultPage = {status, strength -> navController.navigate("ticTacToeResultPage/$status/$strength")})}
+                        //Tic Tac Toe Result Page
+                        composable("ticTacToeResultPage/{status}/{strength}", arguments = listOf(
+                            navArgument("status") {type = NavType.StringType},
+                            navArgument("strength") {type = NavType.IntType}
+                        )) { val status = it.arguments?.getString("status") ?: ""
+                            val strength = it.arguments?.getInt("strength") ?: 1
+                            TicTacToeResultPage(status = status, navController = navController, passwordStrength = strength )
+                        }
+
                         //Vier Gewinnt
                         composable("vierGewinntPage/{passwordStrength}", arguments = listOf(
                             navArgument("passwordStrength") {type = NavType.IntType}

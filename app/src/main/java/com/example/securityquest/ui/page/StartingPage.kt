@@ -17,7 +17,6 @@ import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.List
 import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -30,7 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -47,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -177,12 +176,23 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
                         })
                     }
                 }
+                //um die Tastatur zu schliessen, bevor eine neue Seite gerendert wird 
+                val controller = LocalSoftwareKeyboardController.current
                 Button(onClick = {
                     val passwordStrength = calculatePasswordStrength(passwordFromUser)
                     when(game) {
-                        Game.TIC_TAC_TOE.nameToString -> onNavigateToTicTacToePage(passwordStrength)
-                        Game.VIER_GEWINNT.nameToString -> onNavigateToVierGewinntPage(passwordStrength)
-                        Game.BRICK.nameToString -> onNavigateToBrickPage(passwordStrength)
+                        Game.TIC_TAC_TOE.nameToString -> {
+                            controller?.hide()
+                            onNavigateToTicTacToePage(passwordStrength)
+                        }
+                        Game.VIER_GEWINNT.nameToString -> {
+                            controller?.hide()
+                            onNavigateToVierGewinntPage(passwordStrength)
+                        }
+                        Game.BRICK.nameToString -> {
+                            controller?.hide()
+                            onNavigateToBrickPage(passwordStrength)
+                        }
                     }
 
                 }) {
