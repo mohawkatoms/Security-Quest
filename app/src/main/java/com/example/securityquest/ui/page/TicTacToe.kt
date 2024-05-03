@@ -1,5 +1,6 @@
 package com.example.securityquest.ui.page
 
+import TicTacToe
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,10 +34,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.securityquest.ui.components.AnimatedLinearProgressIndicator
-import com.example.securityquest.ui.components.TicTacToe
 
 @Composable
-fun TicTacToePage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int) {
+fun TicTacToePage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int, onNavigateToTicTacToeResultPage: (String, Int) -> Unit) {
     Box(modifier) {
         var isReturnDialogOpen by rememberSaveable {
             mutableStateOf(false)
@@ -82,7 +82,7 @@ fun TicTacToePage(modifier: Modifier = Modifier, navController: NavController, p
                 )
             }
         }
-        TicTacToe()
+        TicTacToe(onNavigateToTicTacToeResultPage, passwordStrength)
         if (isReturnDialogOpen) {
             Dialog(onDismissRequest = { isReturnDialogOpen = false }) {
                 Card(
