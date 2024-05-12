@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,9 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlin.math.abs
 
 @Composable
 fun TicTacToe(onNavigateToTicTacToeResultPage: (String, Int) -> Unit, passwordStrength: Int) {
@@ -35,7 +34,6 @@ fun TicTacToe(onNavigateToTicTacToeResultPage: (String, Int) -> Unit, passwordSt
         }
         val initialBoard = Array(3) { arrayOfNulls<String>(3) }
         val initialPlayer = "X"
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -91,10 +89,12 @@ fun TicTacToe(onNavigateToTicTacToeResultPage: (String, Int) -> Unit, passwordSt
                             currentPlayer.value = initialPlayer
                             winner.value = null
                         },
-                        modifier = Modifier.padding(top = 60.dp).align(Alignment.CenterHorizontally)
+                        modifier = Modifier
+                            .padding(top = 60.dp)
+                            .align(Alignment.CenterHorizontally)
 
                     ) {
-                        Text(text = "Zürücksetzen")
+                        Text(text = "Zurücksetzen")
                     }
                 }
             }

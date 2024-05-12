@@ -170,8 +170,8 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
                             game = Game.VIER_GEWINNT.nameToString
                             isGameSelectionExpanded = false
                         })
-                        DropdownMenuItem(text = { Text(text = Game.BRICK.nameToString) }, onClick = {
-                            game = Game.BRICK.nameToString
+                        DropdownMenuItem(text = { Text(text = Game.SNAKE.nameToString) }, onClick = {
+                            game = Game.SNAKE.nameToString
                             isGameSelectionExpanded = false
                         })
                     }
@@ -189,7 +189,7 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
                             controller?.hide()
                             onNavigateToVierGewinntPage(passwordStrength)
                         }
-                        Game.BRICK.nameToString -> {
+                        Game.SNAKE.nameToString -> {
                             controller?.hide()
                             onNavigateToBrickPage(passwordStrength)
                         }
