@@ -1,8 +1,5 @@
 package com.example.securityquest.ui.page
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,27 +17,20 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import com.example.securityquest.ui.components.AnimatedLinearProgressIndicator
 
@@ -77,7 +67,7 @@ fun BrickPage(modifier: Modifier = Modifier, navController: NavController, passw
             AnimatedLinearProgressIndicator(indicatorProgress = passwordStrength/100.toFloat())
             Row {
                 Text(
-                    text = "Brick",
+                    text = "Snake",
                     fontSize = 14.sp,
                     textAlign = TextAlign.End,
                     modifier = Modifier.padding(start = 5.dp, top = 5.dp)
@@ -147,13 +137,13 @@ fun BrickPage(modifier: Modifier = Modifier, navController: NavController, passw
                     )
                 ) {
                     Text(
-                        text = "Brick",
+                        text = "Snake",
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         modifier = Modifier.padding(13.dp)
                     )
                     Text(
-                        text = "Das ist eine Anleitung zum Spielen von Brick",
+                        text = "Das ist eine Anleitung zum Spielen von Snake",
                         fontSize = 14.sp,
                         modifier = Modifier.padding(start = 13.dp),
                         lineHeight = 19.sp
@@ -165,7 +155,7 @@ fun BrickPage(modifier: Modifier = Modifier, navController: NavController, passw
                         modifier = Modifier.padding(start = 13.dp, top = 10.dp)
                     )
                     Text(
-                        text = "Zerstöre alle Steine im Level mit einem Ball, der von einem Paddel abprallt.",
+                        text = "Führe die Schlange durch das Spielfeld, und sammle so viel Nahrung wie du kannst.",
                         fontSize = 14.sp,
                         modifier = Modifier.padding(start = 13.dp, end = 13.dp),
                         lineHeight = 19.sp
@@ -177,7 +167,7 @@ fun BrickPage(modifier: Modifier = Modifier, navController: NavController, passw
                         modifier = Modifier.padding(start = 13.dp, top = 10.dp)
                     )
                     Text(
-                        text = "Steuere ein Paddel, um einen Ball abzufeuern und ihn in Richtung der Steine zu lenken. Der Ball prallt dabei von Wänden und dem Paddel ab.",
+                        text = "Steure die Schlange, um sie zu bewegen. Sie wächst, wenn sie Nahrung aufnimmt, und das Spiel endet, wenn sie gegen eine Wand oder ihren eigenen Schwanz stößt.",
                         fontSize = 14.sp,
                         modifier = Modifier.padding(start = 13.dp, end = 13.dp),
                         lineHeight = 19.sp
@@ -189,7 +179,7 @@ fun BrickPage(modifier: Modifier = Modifier, navController: NavController, passw
                         modifier = Modifier.padding(start = 13.dp, top = 10.dp)
                     )
                     Text(
-                        text = "Bewege das Paddel, um den Ball im Spiel zu halten und die Steine zu zerstören. Beende das Level, indem du alle Steine zerstörst, bevor der Ball das Paddel verlässt und ein Leben verlierst.",
+                        text = "Bewege die Schlange, um Punkte zu sammeln, indem du Nahrung aufnimmst.",
                         fontSize = 14.sp,
                         modifier = Modifier.padding(start = 13.dp, end = 13.dp),
                         lineHeight = 19.sp

@@ -17,7 +17,8 @@ import com.example.securityquest.ui.page.BrickPage
 import com.example.securityquest.ui.page.StartingPage
 import com.example.securityquest.ui.page.TicTacToePage
 import com.example.securityquest.ui.page.VierGewinntPage
-import com.example.securityquest.ui.page.tictactoeresult.TicTacToeResultPage
+import com.example.securityquest.ui.page.resultpage.TicTacToeResultPage
+import com.example.securityquest.ui.page.resultpage.VierGewinntResultPage
 import com.example.securityquest.ui.theme.SecurityQuestTheme
 
 class MainActivity : ComponentActivity() {
@@ -55,7 +56,16 @@ class MainActivity : ComponentActivity() {
                         composable("vierGewinntPage/{passwordStrength}", arguments = listOf(
                             navArgument("passwordStrength") {type = NavType.IntType}
                         )) { val passwordStrength = it.arguments?.getInt("passwordStrength") ?: 1
-                            VierGewinntPage(navController = navController, passwordStrength = passwordStrength)}
+                            VierGewinntPage(navController = navController, passwordStrength = passwordStrength, onNavigateToVierGewinntResultPage = {status, strength -> navController.navigate("vierGewinntResultPage/$status/$strength")})}
+                        //Vier Gewinnt Result Page
+                        composable("vierGewinntResultPage/{status}/{strength}", arguments = listOf(
+                            navArgument("status") {type = NavType.StringType},
+                            navArgument("strength") {type = NavType.IntType}
+                        )) { val status = it.arguments?.getString("status") ?: ""
+                            val strength = it.arguments?.getInt("strength") ?: 1
+                            VierGewinntResultPage(status = status, navController = navController, passwordStrength = strength )
+                        }
+
                         //Brick
                         composable("brickPage/{passwordStrength}", arguments = listOf(
                             navArgument("passwordStrength") {type = NavType.IntType}

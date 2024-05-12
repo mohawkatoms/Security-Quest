@@ -1,5 +1,6 @@
 package com.example.securityquest.ui.page
 
+import VierGewinnt
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +37,7 @@ import androidx.navigation.NavController
 import com.example.securityquest.ui.components.AnimatedLinearProgressIndicator
 
 @Composable
-fun VierGewinntPage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int) {
+fun VierGewinntPage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int, onNavigateToVierGewinntResultPage: (String, Int) -> Unit) {
     Box(modifier) {
         var isReturnDialogOpen by rememberSaveable {
             mutableStateOf(false)
@@ -62,7 +63,9 @@ fun VierGewinntPage(modifier: Modifier = Modifier, navController: NavController,
             }
         }
         Column (
-            modifier = Modifier.fillMaxSize().padding(top = 55.dp)) {
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 55.dp)) {
             AnimatedLinearProgressIndicator(indicatorProgress = passwordStrength/100.toFloat())
             Row {
                 Text(
@@ -80,6 +83,7 @@ fun VierGewinntPage(modifier: Modifier = Modifier, navController: NavController,
                 )
             }
         }
+        VierGewinnt(onNavigateToVierGewinntResultPage = onNavigateToVierGewinntResultPage, passwordStrength = passwordStrength)
         if (isReturnDialogOpen) {
             Dialog(onDismissRequest = { isReturnDialogOpen = false }) {
                 Card(
