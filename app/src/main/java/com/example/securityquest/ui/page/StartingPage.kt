@@ -1,6 +1,5 @@
 package com.example.securityquest.ui.page
 
-import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +16,7 @@ import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.List
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,6 +25,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilledIconToggleButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
@@ -83,7 +84,7 @@ val fontFamily = FontFamily(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int) -> Unit, onNavigateToVierGewinntPage: (Int) -> Unit, onNavigateToBrickPage: (Int) -> Unit) {
+fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int) -> Unit, onNavigateToVierGewinntPage: (Int) -> Unit, onNavigateToBrickPage: (Int) -> Unit, onNavigateToLeaderboardPage: () -> Unit) {
     Box(modifier) {
         var isPasswordDialogOpen by rememberSaveable {
             mutableStateOf(false)
@@ -198,6 +199,15 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
                 }) {
                     Icon(imageVector = Icons.Rounded.PlayArrow, contentDescription = null)
                     Text(text = "Spielen")
+                }
+            }
+            Row(modifier = Modifier.padding(top = 315.dp)) {
+                Spacer(modifier = Modifier.weight(1f))
+                FloatingActionButton(
+                    onClick = { onNavigateToLeaderboardPage() },
+                    modifier = Modifier.padding(end = 25.dp)
+                ) {
+                    Icon(imageVector = Icons.Rounded.Star, contentDescription = "Leaderboard")
                 }
             }
         }

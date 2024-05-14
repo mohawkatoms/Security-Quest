@@ -1,6 +1,7 @@
 package com.example.securityquest.ui.components
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text2.input.TextFieldLineLimits
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,5 +20,6 @@ fun FilteredOutlinedTextField(
         },
         label = { Text("Passwort") },
         modifier = Modifier.padding(top = 80.dp),
+        singleLine = true
     )
 }

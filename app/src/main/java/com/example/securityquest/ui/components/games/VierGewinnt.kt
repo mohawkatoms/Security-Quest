@@ -9,34 +9,51 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 
 @Composable
-fun VierGewinnt(onNavigateToVierGewinntResultPage: (String, Int) -> Unit, passwordStrength: Int) {
-    Box (modifier = Modifier.padding(top = 250.dp)){
+fun VierGewinnt(onNavigateToVierGewinntResultPage: (String, Int, Long) -> Unit, passwordStrength: Int) {
+    Box (modifier = Modifier.padding(top = 160.dp)){
         val board = remember {
             mutableStateOf(Array(6) { arrayOfNulls<String>(7) })
         }
-
         val currentPlayer = remember {
             mutableStateOf("X")
         }
         val winner = remember {
             mutableStateOf<String?>(null)
         }
+        val elapsedTime = remember { mutableLongStateOf(0L) }
+        LaunchedEffect(Unit) {
+            while (true) {
+                delay(1000)
+                if (winner.value == null && board.value.any { it.any { it != null } }) {
+                    elapsedTime.longValue++
+                }
+            }
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(13.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = "${elapsedTime.longValue / 60}:${(elapsedTime.longValue % 60).toString().padStart(2, '0')}",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Light,
+                modifier = Modifier.padding(bottom = 100.dp)
+            )
             for (row in board.value.indices) {
                 Row {
                     for (col in board.value[row].indices) {
@@ -52,13 +69,15 @@ fun VierGewinnt(onNavigateToVierGewinntResultPage: (String, Int) -> Unit, passwo
                                         winner.value = checkForWinners(newBoard)
                                         if (winner.value != null || isBoardFulls(newBoard)) {
                                             val result = if (winner.value != null) winner.value!! else "D"
-                                            onNavigateToVierGewinntResultPage(result, passwordStrength)
+                                            val elapsedTimeToGiveToResultPage = elapsedTime.longValue
+                                            onNavigateToVierGewinntResultPage(result, passwordStrength, elapsedTimeToGiveToResultPage)
                                         } else {
                                             makeBotMoves(newBoard, currentPlayer, winner, passwordStrength)
                                             winner.value = checkForWinners(newBoard)
                                             if (winner.value != null || isBoardFulls(newBoard)) {
                                                 val result = if (winner.value != null) winner.value!! else "D"
-                                                onNavigateToVierGewinntResultPage(result, passwordStrength)
+                                                val elapsedTimeToGiveToResultPage = elapsedTime.longValue
+                                                onNavigateToVierGewinntResultPage(result, passwordStrength, elapsedTimeToGiveToResultPage)
                                             }
                                         }
                                     }
@@ -87,6 +106,7 @@ fun VierGewinnt(onNavigateToVierGewinntResultPage: (String, Int) -> Unit, passwo
                     board.value = initialBoard
                     currentPlayer.value = "X"
                     winner.value = null
+                    elapsedTime.longValue = 0
                 },
                 modifier = Modifier
                     .padding(top = 60.dp)
