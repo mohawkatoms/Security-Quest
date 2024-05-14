@@ -1,6 +1,5 @@
 package com.example.securityquest.ui.page
 
-import VierGewinnt
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +17,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,7 +35,7 @@ import androidx.navigation.NavController
 import com.example.securityquest.ui.components.AnimatedLinearProgressIndicator
 
 @Composable
-fun VierGewinntPage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int, onNavigateToVierGewinntResultPage: (String, Int) -> Unit) {
+fun SnakePage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int) {
     Box(modifier) {
         var isReturnDialogOpen by rememberSaveable {
             mutableStateOf(false)
@@ -69,7 +67,7 @@ fun VierGewinntPage(modifier: Modifier = Modifier, navController: NavController,
             AnimatedLinearProgressIndicator(indicatorProgress = passwordStrength/100.toFloat())
             Row {
                 Text(
-                    text = "Vier Gewinnt",
+                    text = "Snake",
                     fontSize = 14.sp,
                     textAlign = TextAlign.End,
                     modifier = Modifier.padding(start = 5.dp, top = 5.dp)
@@ -83,7 +81,7 @@ fun VierGewinntPage(modifier: Modifier = Modifier, navController: NavController,
                 )
             }
         }
-        VierGewinnt(onNavigateToVierGewinntResultPage = onNavigateToVierGewinntResultPage, passwordStrength = passwordStrength)
+
         if (isReturnDialogOpen) {
             Dialog(onDismissRequest = { isReturnDialogOpen = false }) {
                 Card(
@@ -139,13 +137,13 @@ fun VierGewinntPage(modifier: Modifier = Modifier, navController: NavController,
                     )
                 ) {
                     Text(
-                        text = "Vier Gewinnt",
+                        text = "Snake",
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         modifier = Modifier.padding(13.dp)
                     )
                     Text(
-                        text = "Das ist eine Anleitung zum Spielen von Vier Gewinnt",
+                        text = "Das ist eine Anleitung zum Spielen von Snake",
                         fontSize = 14.sp,
                         modifier = Modifier.padding(start = 13.dp),
                         lineHeight = 19.sp
@@ -157,7 +155,19 @@ fun VierGewinntPage(modifier: Modifier = Modifier, navController: NavController,
                         modifier = Modifier.padding(start = 13.dp, top = 10.dp)
                     )
                     Text(
-                        text = "Sei der erste Spieler, der vier seiner Spielsteine horizontal, vertikal oder diagonal in einer Reihe verbindet.",
+                        text = "Führe die Schlange durch das Spielfeld, und sammle so viel Nahrung wie du kannst.",
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 13.dp, end = 13.dp),
+                        lineHeight = 19.sp
+                    )
+                    Text(
+                        text = "Spielmechanik",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 13.dp, top = 10.dp)
+                    )
+                    Text(
+                        text = "Steure die Schlange, um sie zu bewegen. Sie wächst, wenn sie Nahrung aufnimmt, und das Spiel endet, wenn sie gegen eine Wand oder ihren eigenen Schwanz stößt.",
                         fontSize = 14.sp,
                         modifier = Modifier.padding(start = 13.dp, end = 13.dp),
                         lineHeight = 19.sp
@@ -169,19 +179,7 @@ fun VierGewinntPage(modifier: Modifier = Modifier, navController: NavController,
                         modifier = Modifier.padding(start = 13.dp, top = 10.dp)
                     )
                     Text(
-                        text = "Spieler 1 und Spieler 2 wechseln sich ab, um Spielsteine in eine beliebige Spalte des Gitters fallen zu lassen. Die Spielsteine fallen auf die unterste leere Position in der ausgewählten Spalte.",
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 13.dp, end = 13.dp),
-                        lineHeight = 19.sp
-                    )
-                    Text(
-                        text = "Spielfeld",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 13.dp, top = 10.dp)
-                    )
-                    Text(
-                        text = "Ein senkrecht stehendes Gitter mit 7 Spalten und 6 Reihen, in das Spielsteine eingeworfen werden.",
+                        text = "Bewege die Schlange, um Punkte zu sammeln, indem du Nahrung aufnimmst.",
                         fontSize = 14.sp,
                         modifier = Modifier.padding(start = 13.dp, end = 13.dp),
                         lineHeight = 19.sp

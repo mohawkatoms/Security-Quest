@@ -11,17 +11,20 @@ import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 
 @Composable
-fun TicTacToe(onNavigateToTicTacToeResultPage: (String, Int) -> Unit, passwordStrength: Int) {
-    Box(modifier = Modifier.padding(top = 250.dp)) {
+fun TicTacToe(onNavigateToTicTacToeResultPage: (String, Int, Long) -> Unit, passwordStrength: Int) {
+    Box(modifier = Modifier.padding(top = 160.dp)) {
         val board = remember {
             mutableStateOf(Array(3) { arrayOfNulls<String>(3) })
         }
@@ -34,15 +37,28 @@ fun TicTacToe(onNavigateToTicTacToeResultPage: (String, Int) -> Unit, passwordSt
         }
         val initialBoard = Array(3) { arrayOfNulls<String>(3) }
         val initialPlayer = "X"
+        val elapsedTime = remember { mutableLongStateOf(0L) }
+        LaunchedEffect(Unit) {
+            while (true) {
+                delay(1000)
+                if (winner.value == null && board.value.any { it.any { it != null } }) {
+                    elapsedTime.longValue++
+                }
+            }
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
-                .padding(16.dp)
+                .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize()) {
+            Text(
+                text = "${elapsedTime.longValue / 60}:${(elapsedTime.longValue % 60).toString().padStart(2, '0')}",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Light,
+                modifier = Modifier.padding(bottom = 100.dp)
+            )
                 Column {
                     for (row in 0..2) {
                         Row {
@@ -57,13 +73,15 @@ fun TicTacToe(onNavigateToTicTacToeResultPage: (String, Int) -> Unit, passwordSt
                                             winner.value = checkForWinner(newBoard) // Check for winner using the new board
                                             if (winner.value != null || isBoardFull(newBoard)) {
                                                 val result = if (winner.value != null) winner.value!! else "D"
-                                                onNavigateToTicTacToeResultPage(result, passwordStrength)
+                                                val elapsedTimeToGiveToResultPage = elapsedTime.longValue
+                                                onNavigateToTicTacToeResultPage(result, passwordStrength, elapsedTimeToGiveToResultPage)
                                             } else {
                                                 makeBotMove(newBoard, currentPlayer, winner, passwordStrength)
                                                 winner.value = checkForWinner(newBoard) // Check for winner after bot move
                                                 if (winner.value != null || isBoardFull(newBoard)) {
                                                     val result = if (winner.value != null) winner.value!! else "D"
-                                                    onNavigateToTicTacToeResultPage(result, passwordStrength)
+                                                    val elapsedTimeToGiveToResultPage = elapsedTime.longValue
+                                                    onNavigateToTicTacToeResultPage(result, passwordStrength, elapsedTimeToGiveToResultPage)
                                                 }
                                             }
                                         }
@@ -88,6 +106,7 @@ fun TicTacToe(onNavigateToTicTacToeResultPage: (String, Int) -> Unit, passwordSt
                             board.value = initialBoard
                             currentPlayer.value = initialPlayer
                             winner.value = null
+                            elapsedTime.longValue = 0
                         },
                         modifier = Modifier
                             .padding(top = 60.dp)
@@ -97,7 +116,6 @@ fun TicTacToe(onNavigateToTicTacToeResultPage: (String, Int) -> Unit, passwordSt
                         Text(text = "Zurücksetzen")
                     }
                 }
-            }
         }
     }
 }

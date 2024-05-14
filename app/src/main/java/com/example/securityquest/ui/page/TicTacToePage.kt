@@ -36,7 +36,7 @@ import androidx.navigation.NavController
 import com.example.securityquest.ui.components.AnimatedLinearProgressIndicator
 
 @Composable
-fun TicTacToePage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int, onNavigateToTicTacToeResultPage: (String, Int) -> Unit) {
+fun TicTacToePage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int, onNavigateToTicTacToeResultPage: (String, Int, Long) -> Unit) {
     Box(modifier) {
         var isReturnDialogOpen by rememberSaveable {
             mutableStateOf(false)
