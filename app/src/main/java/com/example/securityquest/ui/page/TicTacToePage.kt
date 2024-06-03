@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.Lightbulb
+import androidx.compose.material.icons.outlined.Reply
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.List
 import androidx.compose.material3.Card
@@ -36,7 +39,7 @@ import androidx.navigation.NavController
 import com.example.securityquest.ui.components.AnimatedLinearProgressIndicator
 
 @Composable
-fun TicTacToePage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int, onNavigateToTicTacToeResultPage: (String, Int, Long) -> Unit) {
+fun TicTacToePage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int, password: String, onNavigateToTicTacToeResultPage: (String, Int, Long, String) -> Unit) {
     Box(modifier) {
         var isReturnDialogOpen by rememberSaveable {
             mutableStateOf(false)
@@ -50,7 +53,7 @@ fun TicTacToePage(modifier: Modifier = Modifier, navController: NavController, p
                 onCheckedChange = { isReturnDialogOpen = true },
                 modifier = Modifier.padding(start = 10.dp, top = 10.dp)
             ) {
-                Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Go Back")
+                Icon(imageVector = Icons.Outlined.Reply, contentDescription = "Go Back")
             }
             Spacer(Modifier.weight(1f))
             FilledIconToggleButton(
@@ -58,7 +61,7 @@ fun TicTacToePage(modifier: Modifier = Modifier, navController: NavController, p
                 onCheckedChange = { isExplanationDialogOpen = true },
                 modifier = Modifier.padding(end = 10.dp, top = 10.dp)
             ) {
-                Icon(imageVector = Icons.Rounded.List, contentDescription = "Explanation")
+                Icon(imageVector = Icons.Outlined.Lightbulb, contentDescription = "Explanation")
             }
         }
         Column (
@@ -82,7 +85,7 @@ fun TicTacToePage(modifier: Modifier = Modifier, navController: NavController, p
                 )
             }
         }
-        TicTacToe(onNavigateToTicTacToeResultPage, passwordStrength)
+        TicTacToe(onNavigateToTicTacToeResultPage, passwordStrength, password)
         if (isReturnDialogOpen) {
             Dialog(onDismissRequest = { isReturnDialogOpen = false }) {
                 Card(

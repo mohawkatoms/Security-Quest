@@ -13,9 +13,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.EditNote
+import androidx.compose.material.icons.outlined.EditRoad
+import androidx.compose.material.icons.outlined.Lightbulb
+import androidx.compose.material.icons.outlined.LockOpen
+import androidx.compose.material.icons.outlined.Password
+import androidx.compose.material.icons.outlined.Pattern
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.DeleteSweep
+import androidx.compose.material.icons.rounded.Leaderboard
+import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.List
+import androidx.compose.material.icons.rounded.LockOpen
+import androidx.compose.material.icons.rounded.Password
+import androidx.compose.material.icons.rounded.Pattern
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.QuestionMark
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -84,7 +98,7 @@ val fontFamily = FontFamily(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int) -> Unit, onNavigateToVierGewinntPage: (Int) -> Unit, onNavigateToBrickPage: (Int) -> Unit, onNavigateToLeaderboardPage: () -> Unit) {
+fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int, String) -> Unit, onNavigateToVierGewinntPage: (Int, String) -> Unit, onNavigateToSnakePage: (Int, String) -> Unit, onNavigateToLeaderboardPage: () -> Unit, password: String) {
     Box(modifier) {
         var isPasswordDialogOpen by rememberSaveable {
             mutableStateOf(false)
@@ -93,7 +107,7 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
             mutableStateOf(false)
         }
         var passwordFromUser by rememberSaveable {
-            mutableStateOf("")
+            mutableStateOf(password)
         }
         Row(horizontalArrangement = Arrangement.End) {
             FilledIconToggleButton(
@@ -101,7 +115,7 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
                 onCheckedChange = { isPasswordDialogOpen = true },
                 modifier = Modifier.padding(start = 10.dp, top = 10.dp)
             ) {
-                Icon(imageVector = Icons.Outlined.AddCircle, contentDescription = "Create Password")
+                Icon(imageVector = Icons.Outlined.EditRoad, contentDescription = "Create Password")
             }
             Spacer(Modifier.weight(1f))
             FilledIconToggleButton(
@@ -109,7 +123,7 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
                 onCheckedChange = { isExplanationDialogOpen = true },
                 modifier = Modifier.padding(end = 10.dp, top = 10.dp)
             ) {
-                Icon(imageVector = Icons.Rounded.List, contentDescription = "Explanation")
+                Icon(imageVector = Icons.Outlined.Lightbulb, contentDescription = "Explanation")
             }
         }
         Column(
@@ -143,6 +157,8 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
                 text = passwordFromUser,
                 onChanged = { passwordFromUser = it},
                 ignoredRegex = Regex("[\\s-]"),
+                label = "Passwort",
+                modifier = Modifier.padding(top = 80.dp)
             )
             Row(modifier = Modifier.padding(15.dp)) {
                 ExposedDropdownMenuBox(
@@ -184,21 +200,21 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
                     when(game) {
                         Game.TIC_TAC_TOE.nameToString -> {
                             controller?.hide()
-                            onNavigateToTicTacToePage(passwordStrength)
+                            onNavigateToTicTacToePage(passwordStrength, passwordFromUser)
                         }
                         Game.VIER_GEWINNT.nameToString -> {
                             controller?.hide()
-                            onNavigateToVierGewinntPage(passwordStrength)
+                            onNavigateToVierGewinntPage(passwordStrength, passwordFromUser)
                         }
                         Game.SNAKE.nameToString -> {
                             controller?.hide()
-                            onNavigateToBrickPage(passwordStrength)
+                            onNavigateToSnakePage(passwordStrength, passwordFromUser)
                         }
                     }
 
-                }) {
-                    Icon(imageVector = Icons.Rounded.PlayArrow, contentDescription = null)
-                    Text(text = "Spielen")
+                }, enabled = passwordFromUser.isNotEmpty()) {
+                    Icon(imageVector = Icons.Outlined.LockOpen, contentDescription = null, modifier = Modifier.padding(end = 3.dp))
+                    Text(text = "Knacken")
                 }
             }
             Row(modifier = Modifier.padding(top = 315.dp)) {
@@ -207,7 +223,7 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
                     onClick = { onNavigateToLeaderboardPage() },
                     modifier = Modifier.padding(end = 25.dp)
                 ) {
-                    Icon(imageVector = Icons.Rounded.Star, contentDescription = "Leaderboard")
+                    Icon(imageVector = Icons.Rounded.Leaderboard, contentDescription = "Leaderboard")
                 }
             }
         }
@@ -307,12 +323,20 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
                             checked = useSpecialCharacters,
                             onCheckedChange = { useSpecialCharacters = it })
                     }
-                    Text(
-                        text = "Zurücksetzen & Erstellen",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 13.dp, top = 10.dp)
-                    )
+                    Row {
+                        Text(
+                            text = "Zurücksetzen",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(start = 13.dp, top = 10.dp)
+                        )
+                        Text(
+                            text = "Erstellen",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(start = 53.dp, top = 10.dp)
+                        )
+                    }
                     Row {
                         IconButton(
                             onClick = {
@@ -327,7 +351,7 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
                             enabled = useCapitalCharacters || useLowercaseCharacters || useNumbers || useSpecialCharacters || lengthSlider > 8
                         ) {
                             Icon(
-                                imageVector = Icons.Rounded.Delete,
+                                imageVector = Icons.Rounded.DeleteSweep,
                                 contentDescription = "Zurücksetzen"
                             )
                         }
@@ -341,11 +365,11 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int)
                                     lengthSlider
                                 )
                             },
-                            modifier = Modifier.padding(start = 5.dp),
+                            modifier = Modifier.padding(start = 90.dp),
                             enabled = useCapitalCharacters || useLowercaseCharacters || useNumbers || useSpecialCharacters
                         ) {
                             Icon(
-                                imageVector = Icons.Rounded.PlayArrow,
+                                imageVector = Icons.Outlined.AutoAwesome,
                                 contentDescription = "Erstellen"
                             )
                         }

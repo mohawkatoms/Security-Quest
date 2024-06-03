@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Lightbulb
+import androidx.compose.material.icons.outlined.Reply
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.List
 import androidx.compose.material3.Card
@@ -33,9 +35,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.securityquest.ui.components.AnimatedLinearProgressIndicator
+import com.example.securityquest.ui.components.games.SnakeGame
 
 @Composable
-fun SnakePage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int) {
+fun SnakePage(modifier: Modifier = Modifier, navController: NavController, passwordStrength: Int, password: String, onNavigateToSnakeResultPage: (Int, Int, Long, String, Int) -> Unit) {
     Box(modifier) {
         var isReturnDialogOpen by rememberSaveable {
             mutableStateOf(false)
@@ -49,7 +52,7 @@ fun SnakePage(modifier: Modifier = Modifier, navController: NavController, passw
                 onCheckedChange = { isReturnDialogOpen = true },
                 modifier = Modifier.padding(start = 10.dp, top = 10.dp)
             ) {
-                Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "Go Back")
+                Icon(imageVector = Icons.Outlined.Reply, contentDescription = "Go Back")
             }
             Spacer(Modifier.weight(1f))
             FilledIconToggleButton(
@@ -57,7 +60,7 @@ fun SnakePage(modifier: Modifier = Modifier, navController: NavController, passw
                 onCheckedChange = { isExplanationDialogOpen = true },
                 modifier = Modifier.padding(end = 10.dp, top = 10.dp)
             ) {
-                Icon(imageVector = Icons.Rounded.List, contentDescription = "Explanation")
+                Icon(imageVector = Icons.Outlined.Lightbulb, contentDescription = "Explanation")
             }
         }
         Column (
@@ -81,7 +84,7 @@ fun SnakePage(modifier: Modifier = Modifier, navController: NavController, passw
                 )
             }
         }
-
+        SnakeGame(onNavigateToSnakeResultPage, passwordStrength, password)
         if (isReturnDialogOpen) {
             Dialog(onDismissRequest = { isReturnDialogOpen = false }) {
                 Card(

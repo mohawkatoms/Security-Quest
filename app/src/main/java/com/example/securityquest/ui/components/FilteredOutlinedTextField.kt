@@ -12,14 +12,16 @@ import androidx.compose.ui.unit.dp
 fun FilteredOutlinedTextField(
     text: String,
     onChanged: (String) -> Unit,
-    ignoredRegex: Regex
+    ignoredRegex: Regex,
+    label: String,
+    modifier: Modifier
 ) {
     OutlinedTextField(value = text,
         onValueChange = {
             if (!it.contains(ignoredRegex)) onChanged(it)
         },
-        label = { Text("Passwort") },
-        modifier = Modifier.padding(top = 80.dp),
-        singleLine = true
+        label = { Text(label) },
+        singleLine = true,
+        modifier = modifier
     )
 }
