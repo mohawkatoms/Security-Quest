@@ -1,5 +1,7 @@
 package com.example.securityquest.util
 
+import java.io.File
+
 fun calculatePasswordStrength(password: String): Int {
     var strength = 0
     val len = password.length
@@ -120,3 +122,4 @@ fun calculatePasswordStrength(password: String): Int {
 
     return strength
 }
+

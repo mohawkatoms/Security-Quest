@@ -1,9 +1,12 @@
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.MaterialTheme
@@ -14,25 +17,24 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 
 @Composable
-fun VierGewinnt(onNavigateToVierGewinntResultPage: (String, Int, Long) -> Unit, passwordStrength: Int) {
-    Box (modifier = Modifier.padding(top = 160.dp)){
-        val board = remember {
-            mutableStateOf(Array(6) { arrayOfNulls<String>(7) })
-        }
-        val currentPlayer = remember {
-            mutableStateOf("X")
-        }
-        val winner = remember {
-            mutableStateOf<String?>(null)
-        }
+fun VierGewinnt(onNavigateToVierGewinntResultPage: (String, Int, Long, String) -> Unit, passwordStrength: Int, password: String) {
+    Box(modifier = Modifier.padding(top = 160.dp)) {
+        val board = remember { mutableStateOf(Array(6) { arrayOfNulls<String>(7) }) }
+        val currentPlayer = remember { mutableStateOf("X") }
+        val winner = remember { mutableStateOf<String?>(null) }
         val elapsedTime = remember { mutableLongStateOf(0L) }
+
         LaunchedEffect(Unit) {
             while (true) {
                 delay(1000)
@@ -41,22 +43,33 @@ fun VierGewinnt(onNavigateToVierGewinntResultPage: (String, Int, Long) -> Unit, 
                 }
             }
         }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(13.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "${elapsedTime.longValue / 60}:${(elapsedTime.longValue % 60).toString().padStart(2, '0')}",
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Light,
                 modifier = Modifier.padding(bottom = 100.dp)
             )
             for (row in board.value.indices) {
                 Row {
                     for (col in board.value[row].indices) {
+                        val cellValue = board.value[row][col]
+                        val backgroundColor = when (cellValue) {
+                            "X" -> Color.Red
+                            "O" -> Color.Yellow
+                            else -> MaterialTheme.colorScheme.primary
+                        }
+
+                        val animatedOffsetY = animateFloatAsState(
+                            targetValue = if (cellValue != null) 0f else 50f * (6 - row), label = ""
+                        )
+
                         FilledIconButton(
                             onClick = {
                                 if (winner.value == null) {
@@ -66,36 +79,30 @@ fun VierGewinnt(onNavigateToVierGewinntResultPage: (String, Int, Long) -> Unit, 
                                         newBoard[rowIndex][col] = currentPlayer.value
                                         board.value = newBoard
                                         currentPlayer.value = if (currentPlayer.value == "X") "O" else "X"
-                                        winner.value = checkForWinners(newBoard)
+                                        winner.value = checkForWinner(newBoard)
                                         if (winner.value != null || isBoardFulls(newBoard)) {
-                                            val result = if (winner.value != null) winner.value!! else "D"
-                                            val elapsedTimeToGiveToResultPage = elapsedTime.longValue
-                                            onNavigateToVierGewinntResultPage(result, passwordStrength, elapsedTimeToGiveToResultPage)
+                                            val result = winner.value ?: "D"
+                                            onNavigateToVierGewinntResultPage(result, passwordStrength, elapsedTime.longValue, password)
                                         } else {
-                                            makeBotMoves(newBoard, currentPlayer, winner, passwordStrength)
-                                            winner.value = checkForWinners(newBoard)
+                                            makeBotMove(newBoard, currentPlayer, winner, passwordStrength)
+                                            winner.value = checkForWinner(newBoard)
                                             if (winner.value != null || isBoardFulls(newBoard)) {
-                                                val result = if (winner.value != null) winner.value!! else "D"
-                                                val elapsedTimeToGiveToResultPage = elapsedTime.longValue
-                                                onNavigateToVierGewinntResultPage(result, passwordStrength, elapsedTimeToGiveToResultPage)
+                                                val result = winner.value ?: "D"
+                                                onNavigateToVierGewinntResultPage(result, passwordStrength, elapsedTime.longValue, password)
                                             }
                                         }
                                     }
                                 }
                             },
-                            modifier = Modifier.padding(3.dp),
+                            modifier = Modifier
+                                .padding(3.dp)
                         ) {
                             Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = board.value[row][col] ?: "",
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
+                                modifier = Modifier
+                                    .offset(y = -animatedOffsetY.value.dp)
+                                    .background(backgroundColor, CircleShape)
+                                    .fillMaxSize()
+                            )
                         }
                     }
                 }
@@ -118,7 +125,7 @@ fun VierGewinnt(onNavigateToVierGewinntResultPage: (String, Int, Long) -> Unit, 
     }
 }
 
-fun makeBotMoves(board: Array<Array<String?>>, currentPlayer: MutableState<String>, winner: MutableState<String?>, passwordStrength: Int) {
+private fun makeBotMove(board: Array<Array<String?>>, currentPlayer: MutableState<String>, winner: MutableState<String?>, passwordStrength: Int) {
     if (winner.value == null) {
         val availableMoves = mutableListOf<Pair<Int, Int>>()
         for (col in board[0].indices) {
@@ -128,14 +135,22 @@ fun makeBotMoves(board: Array<Array<String?>>, currentPlayer: MutableState<Strin
             }
         }
 
-        // Choose move based on bot strength
-        when (passwordStrength) {
-            in 1..19 -> randomMoves(board, availableMoves)
-            in 20..39 -> smartMoves(board, currentPlayer.value, availableMoves)
-            in 40..59 -> blockOrWinMoves(board, currentPlayer.value, availableMoves)
-            in 60..79 -> aggressiveMoves(board, currentPlayer.value, availableMoves)
-            in 80..89 -> defensiveMoves(board, currentPlayer.value, availableMoves)
-            100 -> unbeatableMoves(board, currentPlayer.value)
+        // Determine bot level based on password strength
+        val depth = when (passwordStrength) {
+            in 1..9 -> 1
+            in 10..19 -> 2
+            in 20..29 -> 2
+            in 30..39 -> 3
+            in 40..49 -> 3
+            in 50..69 -> 4
+            in 70..89 -> 5
+            in 90..100 -> 6
+            else -> 1
+        }
+
+        val bestMove = minimax(board, currentPlayer.value, depth, Int.MIN_VALUE, Int.MAX_VALUE, true).second
+        if (bestMove.first != -1 && bestMove.second != -1) {
+            board[bestMove.first][bestMove.second] = "O"
         }
 
         currentPlayer.value = if (currentPlayer.value == "X") "O" else "X"
@@ -143,125 +158,7 @@ fun makeBotMoves(board: Array<Array<String?>>, currentPlayer: MutableState<Strin
     }
 }
 
-fun randomMoves(board: Array<Array<String?>>, availableMoves: MutableList<Pair<Int, Int>>) {
-    val move = availableMoves.random()
-    board[move.first][move.second] = "O"
-}
-
-fun smartMoves(board: Array<Array<String?>>, currentPlayer: String, availableMoves: MutableList<Pair<Int, Int>>) {
-    // Implementing a basic AI strategy
-    val centerCol = board[0].size / 2
-    for ((row, col) in availableMoves) {
-        if (col == centerCol) {
-            if (shouldSwitchToNextColumn(board, row, col, currentPlayer)) {
-                continue // Skip this move and move to the next one
-            }
-            board[row][col] = "O"
-            return
-        }
-    }
-    // If center column is not available or the condition to switch to the next column is met, choose randomly
-    randomMoves(board, availableMoves)
-}
-
-private fun shouldSwitchToNextColumn(board: Array<Array<String?>>, row: Int, col: Int, currentPlayer: String): Boolean {
-    if (row >= board.size - 3) {
-        return false // Not enough space at the top of the column
-    }
-    // Check the top 3 rows of the column
-    for (i in row until row + 3) {
-        if (board[i][col] != currentPlayer) {
-            return false // Last symbol in this column was not placed by the player
-        }
-    }
-    // All conditions are met to switch to the next column
-    return true
-}
-fun blockOrWinMoves(board: Array<Array<String?>>, currentPlayer: String, availableMoves: MutableList<Pair<Int, Int>>) {
-    // Check if there's a move that can make the current player win
-    for ((row, col) in availableMoves) {
-        val newBoard = board.map { it.copyOf() }.toTypedArray()
-        newBoard[row][col] = currentPlayer
-        if (checkForWinners(newBoard) == currentPlayer) {
-            board[row][col] = "O"
-            return
-        }
-    }
-
-    // Check if there's a move that can block the opponent from winning
-    val opponent = if (currentPlayer == "X") "O" else "X"
-    for ((row, col) in availableMoves) {
-        val newBoard = board.map { it.copyOf() }.toTypedArray()
-        newBoard[row][col] = opponent
-        if (checkForWinners(newBoard) == opponent) {
-            board[row][col] = "O"
-            return
-        }
-    }
-
-    // If no winning move or blocking move, choose randomly
-    randomMoves(board, availableMoves)
-}
-
-fun aggressiveMoves(board: Array<Array<String?>>, currentPlayer: String, availableMoves: MutableList<Pair<Int, Int>>) {
-    // Check if there's a move that can make the current player win
-    for ((row, col) in availableMoves) {
-        val newBoard = board.map { it.copyOf() }.toTypedArray()
-        newBoard[row][col] = currentPlayer
-        if (checkForWinners(newBoard) == currentPlayer) {
-            board[row][col] = "O"
-            return
-        }
-    }
-
-    // Check if there's a move that can block the opponent from winning
-    val opponent = if (currentPlayer == "X") "O" else "X"
-    for ((row, col) in availableMoves) {
-        val newBoard = board.map { it.copyOf() }.toTypedArray()
-        newBoard[row][col] = opponent
-        if (checkForWinners(newBoard) == opponent) {
-            board[row][col] = "O"
-            return
-        }
-    }
-
-    // If no winning or blocking move, choose randomly
-    randomMoves(board, availableMoves)
-}
-
-fun defensiveMoves(board: Array<Array<String?>>, currentPlayer: String, availableMoves: MutableList<Pair<Int, Int>>) {
-    // Check if there's a move that can block the opponent from winning
-    val opponent = if (currentPlayer == "X") "O" else "X"
-    for ((row, col) in availableMoves) {
-        val newBoard = board.map { it.copyOf() }.toTypedArray()
-        newBoard[row][col] = opponent
-        if (checkForWinners(newBoard) == opponent) {
-            board[row][col] = "O"
-            return
-        }
-    }
-
-    // Check if there's a move that can make the current player win
-    for ((row, col) in availableMoves) {
-        val newBoard = board.map { it.copyOf() }.toTypedArray()
-        newBoard[row][col] = currentPlayer
-        if (checkForWinners(newBoard) == currentPlayer) {
-            board[row][col] = "O"
-            return
-        }
-    }
-
-    // If no winning or blocking move, choose randomly
-    randomMoves(board, availableMoves)
-}
-
-fun unbeatableMoves(board: Array<Array<String?>>, currentPlayer: String) {
-    val depth = 5 // Depth of search for the minimax algorithm
-    val bestMove = minimax(board, currentPlayer, depth, Int.MIN_VALUE, Int.MAX_VALUE, true).second
-    board[bestMove.first][bestMove.second] = "O"
-}
-
-fun minimax(
+private fun minimax(
     board: Array<Array<String?>>, currentPlayer: String,
     depth: Int, alpha: Int, beta: Int, maximizingPlayer: Boolean
 ): Pair<Int, Pair<Int, Int>> {
@@ -273,7 +170,7 @@ fun minimax(
         }
     }
 
-    val result = checkForWinners(board)
+    val result = checkForWinner(board)
     if (depth == 0 || result != null) {
         return evaluate(board, currentPlayer) to Pair(-1, -1)
     }
@@ -319,14 +216,14 @@ fun minimax(
     }
 }
 
-fun evaluate(board: Array<Array<String?>>, currentPlayer: String): Int {
+private fun evaluate(board: Array<Array<String?>>, currentPlayer: String): Int {
     val opponent = if (currentPlayer == "X") "O" else "X"
     val playerScore = evaluatePlayer(board, currentPlayer)
     val opponentScore = evaluatePlayer(board, opponent)
     return playerScore - opponentScore
 }
 
-fun evaluatePlayer(board: Array<Array<String?>>, player: String): Int {
+private fun evaluatePlayer(board: Array<Array<String?>>, player: String): Int {
     var score = 0
     for (row in board.indices) {
         for (col in board[row].indices) {
@@ -361,7 +258,6 @@ fun evaluatePlayer(board: Array<Array<String?>>, player: String): Int {
     return score
 }
 
-
 private fun findLowestEmptyRow(board: Array<Array<String?>>, columnIndex: Int): Int {
     for (rowIndex in board.indices.reversed()) {
         if (board[rowIndex][columnIndex] == null) {
@@ -370,7 +266,8 @@ private fun findLowestEmptyRow(board: Array<Array<String?>>, columnIndex: Int): 
     }
     return -1 // Column is full
 }
-private fun checkForWinners(board: Array<Array<String?>>): String? {
+
+private fun checkForWinner(board: Array<Array<String?>>): String? {
     for (row in board.indices) {
         for (col in board[row].indices) {
             val player = board[row][col]

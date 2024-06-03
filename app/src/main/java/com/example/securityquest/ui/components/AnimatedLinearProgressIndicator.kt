@@ -39,7 +39,7 @@ fun AnimatedLinearProgressIndicator(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(20.dp))
-                .height(5.dp)
+                .height(8.dp)
         )
         LaunchedEffect(lifecycleOwner) {
             progress = indicatorProgress

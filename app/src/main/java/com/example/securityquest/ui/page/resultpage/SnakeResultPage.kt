@@ -1,5 +1,6 @@
 package com.example.securityquest.ui.page.resultpage
 
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.compose.animation.core.Animatable
@@ -17,14 +18,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Create
 import androidx.compose.material.icons.rounded.EmojiEvents
+import androidx.compose.material.icons.rounded.ExitToApp
 import androidx.compose.material.icons.rounded.Leaderboard
 import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
@@ -65,13 +69,15 @@ import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+@SuppressLint("RestrictedApi")
 @Composable
-fun VierGewinntResultPage(
-    status: String,
+fun SnakeResultPage(
+    score: Int,
     navController: NavController,
     passwordStrength: Int,
     time: Long,
-    password: String
+    password: String,
+    points: Int
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -82,6 +88,8 @@ fun VierGewinntResultPage(
         var playerName by rememberSaveable { mutableStateOf("") }
         var alreadyPublishedEntry by rememberSaveable { mutableStateOf(false) }
         var publishPassword by rememberSaveable { mutableStateOf(false) }
+        val pointsToWin = 3 + (27 * (passwordStrength - 1) / 99)
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -89,38 +97,30 @@ fun VierGewinntResultPage(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val icon = when (status) {
-                "X" -> Icons.Outlined.LockOpen
-                "O" -> Icons.Outlined.Lock
-                "D" -> Icons.Outlined.Lock
-                else -> Icons.Rounded.Warning
+            val icon = if (score == 1) {
+                Icons.Outlined.LockOpen
+            } else {
+                Icons.Outlined.Lock
             }
             Icon(icon, contentDescription = "Copy", Modifier.size(120.dp), tint = MaterialTheme.colorScheme.secondary)
-            val text = when (status) {
-                "X" -> "Du hast das Passwort geknackt"
-                "O" -> "Du hast das Passwort nicht geknackt"
-                "D" -> "Du hast das Passwort fast geknackt"
-                else -> ""
-            }
             Text(
-                text = text,
+                text = if(score == 1) {
+                    "Du hast das Passwort geknackt"
+                } else {
+                    "Das Passwort war zu sicher"
+                },
                 style = MaterialTheme.typography.headlineSmall,
-                color = when (status) {
-                    "X" -> MaterialTheme.colorScheme.error
-                    "O" -> MaterialTheme.colorScheme.primary
+                color = when (score) {
+                    1 -> MaterialTheme.colorScheme.error
+                    0 -> MaterialTheme.colorScheme.primary
                     else -> MaterialTheme.colorScheme.secondary },
                 modifier = Modifier.padding(bottom = 8.dp, top = 90.dp)
             )
             Text(
-                text = when (status) {
-                    "X" -> "Versuche es lieber mit einem stärkeren Passwort"
-                    "O" -> "Das Passwort schützt dich zuverlässig"
-                    "D" -> if(passwordStrength < 70) {
-                        "Das Passwort könnte noch stärker sein"
-                    } else {
-                        "Das Passwort schützt dich in den meisten Fällen"
-                    }
-                    else -> ""
+                text = when (score) {
+                    1 -> "Versuche es lieber mit einem stärkeren Passwort"
+                    0 -> "Das Passwort schützt dich zuverlässig"
+                    else -> {"Das Passwort ist sicher"}
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.secondary,
@@ -143,12 +143,17 @@ fun VierGewinntResultPage(
                 modifier = Modifier.padding(bottom = 12.dp)
             )
             Text(
+                text = "Erreichte Punkte: $points/$pointsToWin",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+            Text(
                 text = "Deine Zeit: ${time / 60}:${(time % 60).toString().padStart(2, '0')}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
-
             var scale = 1f
             val scaleAnimation = remember { Animatable(1f) }
             LaunchedEffect(Unit) {
@@ -165,7 +170,8 @@ fun VierGewinntResultPage(
                     navController.navigate("startingPage") {
                         popUpTo("startingPage") { inclusive = true }
                     }
-                    navController.navigate("vierGewinntPage/$passwordStrength/$password")
+                    navController.navigate("snakePage/$passwordStrength/$password")
+
                 },
                 modifier = Modifier
                     .padding(bottom = 8.dp)
@@ -205,7 +211,7 @@ fun VierGewinntResultPage(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(520.dp)
+                            .height(560.dp)
                             .padding(16.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
@@ -231,7 +237,7 @@ fun VierGewinntResultPage(
                             modifier = Modifier.padding(start = 13.dp, top = 10.dp)
                         )
                         Text(
-                            text = "Vier Gewinnt",
+                            text = "Snake",
                             fontSize = 14.sp,
                             modifier = Modifier.padding(start = 13.dp, end = 13.dp),
                             lineHeight = 19.sp
@@ -261,17 +267,25 @@ fun VierGewinntResultPage(
                             lineHeight = 19.sp
                         )
                         Text(
+                            text = "Punkte",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(start = 13.dp, top = 10.dp)
+                        )
+                        Text(
+                            text = "$points/$pointsToWin",
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(start = 13.dp, end = 13.dp),
+                            lineHeight = 19.sp
+                        )
+                        Text(
                             text = "Ergebnis",
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
                             modifier = Modifier.padding(start = 13.dp, top = 10.dp)
                         )
                         Text(
-                            text = when (status) {
-                                "X" -> "Gewonnen"
-                                "O" -> "Verloren"
-                                else -> "Unentschieden"
-                            },
+                            text = if(score == 1) {"Geknackt"} else {"Nicht Geknackt"},
                             fontSize = 14.sp,
                             modifier = Modifier.padding(start = 13.dp, end = 13.dp),
                             lineHeight = 19.sp
@@ -306,7 +320,7 @@ fun VierGewinntResultPage(
                             TextButton(onClick = {
                                 isLeaderboardDialogOpen = false
                                 scope.launch {
-                                    val success = addEntry(passwordStrength, playerName, status, time, publishPassword, password)
+                                    val success = addEntry(passwordStrength, playerName, score, time, publishPassword, password)
                                     if (success) {
                                         snackbarHostState.showSnackbar("Eintrag erfolgreich hinzugefügt!")
                                     } else {
@@ -330,14 +344,13 @@ fun VierGewinntResultPage(
     }
 }
 
-private suspend fun addEntry(passwordStrength: Int, playerName: String, status: String, time: Long, publishPassword: Boolean, password: String): Boolean {
+private suspend fun addEntry(passwordStrength: Int, playerName: String, score: Int, time: Long, publishPassword: Boolean, password: String): Boolean {
     val db = Firebase.firestore
-    val ergebnis = if (status == "X") "Gewonnen" else if (status == "O") "Verloren" else "Unentschieden"
     val entry = hashMapOf(
-        "Spiel" to "Vier Gewinnt",
+        "Spiel" to "Snake",
         "Level" to passwordStrength,
         "Name" to playerName,
-        "Status" to ergebnis,
+        "Status" to if (score == 1) "Gewonnen" else "Verloren",
         "Zeit" to time,
         "Passwort" to if (publishPassword) password else null
     )
