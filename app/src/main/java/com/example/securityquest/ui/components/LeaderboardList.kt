@@ -78,7 +78,7 @@ fun LeaderboardScreen(
 
         // Further filter to show only won games if required
         val wonEntries = if (showOnlyWonGames) {
-            filteredEntries.filter { it.gameState == "Gewonnen" }
+            filteredEntries.filter { it.gameState == "Verloren" || it.gameState == "Unentschieden" }
         } else {
             filteredEntries
         }

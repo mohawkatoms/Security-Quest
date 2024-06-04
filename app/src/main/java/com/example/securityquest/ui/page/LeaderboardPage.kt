@@ -222,7 +222,7 @@ fun FilterDialog(
                     modifier = Modifier.padding(start = 13.dp, top = 10.dp)
                 )
                 Text(
-                    text = "Geknackt",
+                    text = "Nicht Geknackt",
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                     modifier = Modifier.padding(start = 58.dp, top = 10.dp)

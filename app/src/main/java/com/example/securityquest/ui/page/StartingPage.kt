@@ -14,14 +14,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.ChecklistRtl
 import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.EditRoad
+import androidx.compose.material.icons.outlined.GeneratingTokens
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.material.icons.outlined.Password
 import androidx.compose.material.icons.outlined.Pattern
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DeleteSweep
+import androidx.compose.material.icons.rounded.GeneratingTokens
 import androidx.compose.material.icons.rounded.Leaderboard
 import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.List
@@ -115,7 +118,7 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int,
                 onCheckedChange = { isPasswordDialogOpen = true },
                 modifier = Modifier.padding(start = 10.dp, top = 10.dp)
             ) {
-                Icon(imageVector = Icons.Outlined.EditRoad, contentDescription = "Create Password")
+                Icon(imageVector = Icons.Outlined.Pattern, contentDescription = "Create Password")
             }
             Spacer(Modifier.weight(1f))
             FilledIconToggleButton(
