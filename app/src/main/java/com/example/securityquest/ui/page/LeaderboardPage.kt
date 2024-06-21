@@ -12,10 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material.icons.outlined.Reply
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.FilterAlt
-import androidx.compose.material.icons.rounded.List
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -80,10 +76,13 @@ fun LeaderboardPage(navController: NavController) {
             showSnake, showTicTacToe, showVierGewinnt, refreshTrigger, navController
         )
         if (isReturnDialogOpen) {
-            ReturnDialog(isReturnDialogOpen) {
-                isReturnDialogOpen = false
-                navController.popBackStack()
-            }
+            ReturnDialog(
+                onCancel = { isReturnDialogOpen = false },
+                onLeave = {
+                    isReturnDialogOpen = false
+                    navController.popBackStack()
+                }
+            )
         }
         if (isFilterDialogOpen) {
             FilterDialog(
@@ -102,40 +101,38 @@ fun LeaderboardPage(navController: NavController) {
 }
 
 @Composable
-fun ReturnDialog(isOpen: Boolean, onLeave: () -> Unit) {
-    if (isOpen) {
-        Dialog(onDismissRequest = { onLeave() }) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .padding(16.dp), shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                ),
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 6.dp
-                )
-            ) {
-                Text(
-                    text = "Leaderboard verlassen",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(13.dp)
-                )
-                Text(
-                    text = "Sind Sie sicher, dass sie das Leaderboard verlassen möchten?",
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(start = 13.dp, end = 13.dp)
-                )
-                Row {
-                    Spacer(Modifier.weight(1f))
-                    TextButton(onClick = { onLeave() }) {
-                        Text(text = "Abbrechen")
-                    }
-                    TextButton(onClick = { onLeave() }) {
-                        Text(text = "Verlassen")
-                    }
+fun ReturnDialog(onCancel: () -> Unit, onLeave: () -> Unit) {
+    Dialog(onDismissRequest = { onCancel() }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
+                .padding(16.dp), shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 6.dp
+            )
+        ) {
+            Text(
+                text = "Leaderboard verlassen",
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                modifier = Modifier.padding(13.dp)
+            )
+            Text(
+                text = "Sind Sie sicher, dass sie das Leaderboard verlassen möchten?",
+                fontSize = 14.sp,
+                modifier = Modifier.padding(start = 13.dp, end = 13.dp)
+            )
+            Row {
+                Spacer(Modifier.weight(1f))
+                TextButton(onClick = { onCancel() }) {
+                    Text(text = "Abbrechen")
+                }
+                TextButton(onClick = { onLeave() }) {
+                    Text(text = "Verlassen")
                 }
             }
         }

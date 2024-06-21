@@ -82,6 +82,9 @@ dependencies {
     //Google Extended Icons
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
 
+    //OkHttp
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
+
     //Default
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

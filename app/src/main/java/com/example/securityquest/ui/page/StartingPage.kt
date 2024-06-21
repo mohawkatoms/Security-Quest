@@ -1,5 +1,9 @@
 package com.example.securityquest.ui.page
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,28 +16,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.AddModerator
 import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.ChecklistRtl
-import androidx.compose.material.icons.outlined.EditNote
-import androidx.compose.material.icons.outlined.EditRoad
-import androidx.compose.material.icons.outlined.GeneratingTokens
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.LockOpen
-import androidx.compose.material.icons.outlined.Password
 import androidx.compose.material.icons.outlined.Pattern
-import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DeleteSweep
-import androidx.compose.material.icons.rounded.GeneratingTokens
 import androidx.compose.material.icons.rounded.Leaderboard
-import androidx.compose.material.icons.rounded.Lightbulb
-import androidx.compose.material.icons.rounded.List
-import androidx.compose.material.icons.rounded.LockOpen
-import androidx.compose.material.icons.rounded.Password
-import androidx.compose.material.icons.rounded.Pattern
-import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material.icons.rounded.QuestionMark
-import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -48,6 +37,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -58,6 +49,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -80,6 +72,14 @@ import com.example.securityquest.model.Game
 import com.example.securityquest.ui.components.FilteredOutlinedTextField
 import com.example.securityquest.util.calculatePasswordStrength
 import com.example.securityquest.util.generatePassword
+import kotlinx.coroutines.launch
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import okio.IOException
+import java.security.MessageDigest
 
 //Font von Uberschrift
 val provider = GoogleFont.Provider(
@@ -98,10 +98,11 @@ val fontFamily = FontFamily(
         style = FontStyle.Italic
     )
 )
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int, String) -> Unit, onNavigateToVierGewinntPage: (Int, String) -> Unit, onNavigateToSnakePage: (Int, String) -> Unit, onNavigateToLeaderboardPage: () -> Unit, password: String) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     Box(modifier) {
         var isPasswordDialogOpen by rememberSaveable {
             mutableStateOf(false)
@@ -112,6 +113,47 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int,
         var passwordFromUser by rememberSaveable {
             mutableStateOf(password)
         }
+        var howOftenWasPasswordPwned by rememberSaveable {
+            mutableIntStateOf(-1)
+        }
+
+        fun checkPwned(password: String, onResult: (Int) -> Unit) {
+            val client = OkHttpClient()
+
+            val hashedPassword = MessageDigest.getInstance("SHA-1").digest(password.toByteArray()).joinToString("") { "%02x".format(it) }
+            val request = Request.Builder()
+                .url("https://api.pwnedpasswords.com/range/${hashedPassword.take(5)}")
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    e.printStackTrace()
+                    onResult(-1) // Indicate an error occurred
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    response.use {
+                        if (!response.isSuccessful) {
+                            onResult(-1) // Indicate an error occurred
+                            throw IOException("Unexpected code $response")
+                        }
+
+                        val apiResponse = response.body!!.string().trimIndent()
+                        val responseMap = apiResponse.lines().associate { line ->
+                            val parts = line.split(":")
+                            parts[0] to parts[1].toInt()
+                        }
+                        Log.w("ResponseMap::", responseMap.toString())
+                        val searchString = hashedPassword.substring(5).uppercase()
+                        Log.w("Searchstring::", searchString)
+                        val number = responseMap[searchString] ?: 0 // Use 0 if not found
+                        Log.w("Number::", number.toString())
+                        onResult(number) // Pass the result to the callback
+                    }
+                }
+            })
+        }
+
         Row(horizontalArrangement = Arrangement.End) {
             FilledIconToggleButton(
                 checked = isPasswordDialogOpen,
@@ -158,11 +200,33 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int,
             }
             FilteredOutlinedTextField(
                 text = passwordFromUser,
-                onChanged = { passwordFromUser = it},
+                onChanged = { passwordFromUser = it
+                            howOftenWasPasswordPwned = -1},
                 ignoredRegex = Regex("[\\s-]"),
                 label = "Passwort",
-                modifier = Modifier.padding(top = 80.dp)
+                modifier = Modifier.padding(top = 80.dp),
+                {
+                    IconButton(onClick = { checkPwned(passwordFromUser) {result ->
+                        scope.launch {
+                        if (context.isOnline()) {
+                            if (result == 0) {
+                                howOftenWasPasswordPwned = 0
+                                snackbarHostState.showSnackbar("Passwort ist in keinem Datenleck aufgetaucht!")
+
+                            } else {
+                                howOftenWasPasswordPwned = result
+                                snackbarHostState.showSnackbar("Passwort ist in $result Datenlecks aufgetaucht!")
+                            }
+                        }else {
+                            howOftenWasPasswordPwned = -1
+                            snackbarHostState.showSnackbar("Stelle eine Internetverbindung her!")
+                        }
+                        }}}, enabled = passwordFromUser.isNotEmpty()) {
+                        Icon(imageVector = Icons.Outlined.AddModerator, contentDescription = "Create Password", tint = when(howOftenWasPasswordPwned){ -1 -> MaterialTheme.colorScheme.onBackground; 0 -> MaterialTheme.colorScheme.primary; in 0..Int.MAX_VALUE -> MaterialTheme.colorScheme.error; else -> MaterialTheme.colorScheme.onBackground })
+                    }
+                }
             )
+
             Row(modifier = Modifier.padding(15.dp)) {
                 ExposedDropdownMenuBox(
                     expanded = isGameSelectionExpanded,
@@ -230,6 +294,10 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int,
                 }
             }
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
         if (isPasswordDialogOpen) {
             Dialog(onDismissRequest = { isPasswordDialogOpen = false }) {
                 var lengthSlider by remember { mutableIntStateOf(8) }
@@ -476,4 +544,19 @@ fun StartingPage(modifier: Modifier = Modifier, onNavigateToTicTacToePage: (Int,
 
         }
     }
+}
+
+fun Context.isOnline(): Boolean {
+    val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+    if (capabilities != null) {
+        if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+            return true
+        } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+            return true
+        } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+            return true
+        }
+    }
+    return false
 }
