@@ -140,8 +140,8 @@ fun LeaderboardList(entries: List<LeaderboardEntry>, navController: NavControlle
                         entry.game,
                         color =
                             when (entry.gameState) {
-                                "Gewonnen" -> MaterialTheme.colorScheme.primary
-                                "Verloren" -> MaterialTheme.colorScheme.error
+                                "Gewonnen" -> MaterialTheme.colorScheme.error
+                                "Verloren" -> MaterialTheme.colorScheme.primary
                                 else -> MaterialTheme.colorScheme.secondary
                             }
                     )

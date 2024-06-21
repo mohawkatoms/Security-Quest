@@ -14,7 +14,8 @@ fun FilteredOutlinedTextField(
     onChanged: (String) -> Unit,
     ignoredRegex: Regex,
     label: String,
-    modifier: Modifier
+    modifier: Modifier,
+    trailingIcon: @Composable (() -> Unit)? = null
 ) {
     OutlinedTextField(value = text,
         onValueChange = {
@@ -22,6 +23,7 @@ fun FilteredOutlinedTextField(
         },
         label = { Text(label) },
         singleLine = true,
-        modifier = modifier
+        modifier = modifier,
+        trailingIcon = trailingIcon
     )
 }

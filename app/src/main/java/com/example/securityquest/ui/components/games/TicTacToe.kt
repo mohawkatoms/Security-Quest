@@ -168,15 +168,15 @@ private fun makeBotMove(
         // Adjust minimax depth based on password strength
         val depth = when {
             passwordStrength <= 10 -> 1
-            passwordStrength <= 20 -> 2
-            passwordStrength <= 30 -> 3
-            passwordStrength <= 40 -> 4
-            passwordStrength <= 50 -> 5
-            passwordStrength <= 60 -> 6
-            passwordStrength <= 70 -> 7
-            passwordStrength <= 80 -> 8
-            passwordStrength <= 90 -> 9
-            else -> 10
+            passwordStrength <= 20 -> 1
+            passwordStrength <= 30 -> 2
+            passwordStrength <= 40 -> 3
+            passwordStrength <= 50 -> 4
+            passwordStrength <= 60 -> 5
+            passwordStrength <= 70 -> 5
+            passwordStrength <= 80 -> 6
+            passwordStrength <= 90 -> 7
+            else -> 8
         }
 
         val bestMove = findBestMove(board, depth)

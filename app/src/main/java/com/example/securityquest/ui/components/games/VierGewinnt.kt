@@ -218,9 +218,7 @@ private fun minimax(
 
 private fun evaluate(board: Array<Array<String?>>, currentPlayer: String): Int {
     val opponent = if (currentPlayer == "X") "O" else "X"
-    val playerScore = evaluatePlayer(board, currentPlayer)
-    val opponentScore = evaluatePlayer(board, opponent)
-    return playerScore - opponentScore
+    return evaluatePlayer(board, currentPlayer) - evaluatePlayer(board, opponent)
 }
 
 private fun evaluatePlayer(board: Array<Array<String?>>, player: String): Int {

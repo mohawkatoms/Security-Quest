@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,8 +42,8 @@ fun SnakeGame(onNavigateToSnakeResultPage: (Int, Int, Long, String, Int) -> Unit
     Box(modifier = Modifier.padding(top = 130.dp)) {
         var snake by remember { mutableStateOf(listOf(Position(5, 5))) }
         var direction by remember { mutableStateOf(Direction.RIGHT) }
-        var food by remember { mutableStateOf(generateFood(snake, level)) }
         var obstacles by remember { mutableStateOf(generateObstacles(level, snake)) }
+        var food by remember { mutableStateOf(generateFood(snake, level, obstacles)) }
         var score by remember { mutableIntStateOf(0) }
         var elapsedTime by remember { mutableLongStateOf(0L) }
         var isGameOver by remember { mutableStateOf(false) }
@@ -68,7 +69,7 @@ fun SnakeGame(onNavigateToSnakeResultPage: (Int, Int, Long, String, Int) -> Unit
                             finalScore = 1 // User wins
                             isGameOver = true
                         } else {
-                            food = generateFood(snake, level)
+                            food = generateFood(snake, level, obstacles)
                         }
                     }
                 ).also { newSnake ->
@@ -122,26 +123,40 @@ fun GameBoard(snake: List<Position>, food: Position, obstacles: List<Position>) 
             .background(MaterialTheme.colorScheme.inversePrimary)
             .padding(1.dp)
     ) {
+        for (x in 0 until 30) {
+            for (y in 0 until 30) {
+                val isDarkSquare = (x + y) % 2 == 0
+                val squareColor = if (isDarkSquare) Color(0xFFC8E6C9) else Color(0xFFA5D6A7)
+                Box(
+                    modifier = Modifier
+                        .size(10.dp)
+                        .offset(x * 10.dp, y * 10.dp)
+                        .background(squareColor)
+                )
+            }
+        }
+
         snake.forEach { segment ->
             Box(
                 modifier = Modifier
                     .size(10.dp)
                     .offset(segment.x * 10.dp, segment.y * 10.dp)
-                    .background(MaterialTheme.colorScheme.primary)
+                    .background(Color.Blue)
             )
         }
         Box(
             modifier = Modifier
                 .size(10.dp)
                 .offset(food.x * 10.dp, food.y * 10.dp)
-                .background(MaterialTheme.colorScheme.error)
+                .clip(CircleShape)
+                .background(Color.Red)
         )
         obstacles.forEach { obstacle ->
             Box(
                 modifier = Modifier
                     .size(10.dp)
                     .offset(obstacle.x * 10.dp, obstacle.y * 10.dp)
-                    .background(MaterialTheme.colorScheme.secondary)
+                    .background(Color.DarkGray)
             )
         }
     }
@@ -210,7 +225,7 @@ private fun moveSnake(
     return newSnake
 }
 
-private fun generateFood(snake: List<Position>, level: Int): Position {
+private fun generateFood(snake: List<Position>, level: Int, obstacles: List<Position>): Position {
     var newFood: Position
     val wallDistance = if (level <= 6) 3 else 1
     do {
@@ -218,7 +233,7 @@ private fun generateFood(snake: List<Position>, level: Int): Position {
             x = Random.nextInt(wallDistance, 30 - wallDistance),
             y = Random.nextInt(wallDistance, 30 - wallDistance)
         )
-    } while (newFood in snake)
+    } while (newFood in snake || newFood in obstacles)
     return newFood
 }
 

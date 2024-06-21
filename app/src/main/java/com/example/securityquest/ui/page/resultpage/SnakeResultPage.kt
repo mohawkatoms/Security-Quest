@@ -211,7 +211,7 @@ fun SnakeResultPage(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(560.dp)
+                            .height(565.dp)
                             .padding(16.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
